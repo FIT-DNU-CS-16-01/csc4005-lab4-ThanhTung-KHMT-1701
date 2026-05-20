@@ -193,30 +193,31 @@ Log cuối run:
 
 ## 11. Kết quả hiện tại
 
-Run baseline hoàn tất bằng GPU với cấu hình 50 epochs:
+Hai run đều hoàn tất 50 epochs trên GPU và được log W&B:
 
-- Config: `configs/baseline_logmel_crnn.json`
-- Output: `outputs/logmel_crnn_gru_baseline_e50_gpu/`
-- best_val_acc: 0.7463
-- test_acc: 0.7814
-- avg_epoch_time_sec: 83.59
+| Run | Config | Output | best_val_acc | test_acc | avg_epoch_time_sec |
+|---|---|---|---:|---:|---:|
+| Baseline GRU | `configs/baseline_logmel_crnn.json` | `outputs/logmel_crnn_gru_baseline_e50_gpu/` | 0.7463 | 0.7814 | 83.59 |
+| Extension BiLSTM | `configs/extension_bilstm_crnn.json` | `outputs/logmel_crnn_bilstm_extension_e50_gpu/` | 0.7218 | 0.7228 | 81.49 |
 
 W&B links:
 
 - Project: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn
 - Debug run: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cj951u5k
-- Baseline run: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cfccch9h
+- Baseline GRU: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cfccch9h
+- Extension BiLSTM: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/rcsrrb3x
 
 ## 12. So sánh nhanh với Lab 3
 
 | Run | Feature | Model | test_acc | trainable_params | avg_epoch_time_sec |
 |---|---|---|---:|---:|---:|
 | Lab 3 log-mel (best) | log-mel | 1D-CNN | 0.5914 | 145,610 | 4.55 |
-| Lab 4 baseline (run chính) | log-mel | CRNN-GRU | 0.7814 | 71,338 | 83.59 |
+| Lab 4 baseline (GRU) | log-mel | CRNN-GRU | 0.7814 | 71,338 | 83.59 |
+| Lab 4 extension (BiLSTM) | log-mel | CRNN-BiLSTM | 0.7228 | 150,250 | 81.49 |
 
-Chi tiết các run còn lại được lưu trong `outputs/1771040029_*` (Lab 3) và `outputs/logmel_crnn_gru_baseline_e50_gpu/` (Lab 4). Bảng so sánh đầy đủ nằm tại mục 8 trong `REPORT_TEMPLATE.md`.
+Chi tiết các run còn lại được lưu trong `outputs/1771040029_*` (Lab 3) và `outputs/logmel_crnn_*_e50_gpu/` (Lab 4). Bảng so sánh đầy đủ và bàn luận nằm tại mục 8 và 8b trong `REPORT_TEMPLATE.md`.
 
 Ghi chú:
 
-- Run mở rộng BiLSTM 50 epochs chưa hoàn tất do giới hạn thời gian.
 - Báo cáo chi tiết đã điền tại `REPORT_TEMPLATE.md`.
+- BiLSTM chưa vượt được GRU baseline trên fold 10, cần thử thêm lr/dropout hoặc k-fold CV để kết luận công bằng.

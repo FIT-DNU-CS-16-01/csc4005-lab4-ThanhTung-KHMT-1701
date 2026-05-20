@@ -44,18 +44,18 @@ Mục tiêu của Lab 4 là xây dựng mô hình CRNN để phân loại 10 l�
 
 ## 5. Kết quả huấn luyện
 
-Nguồn số liệu: outputs/logmel_crnn_gru_baseline_e50_gpu/metrics.json và W&B.
+Nguồn số liệu: `outputs/logmel_crnn_gru_baseline_e50_gpu/metrics.json`, `outputs/logmel_crnn_bilstm_extension_e50_gpu/metrics.json` và W&B.
 
-| Run | best_val_acc | test_acc | Ghi chú |
-|---|---:|---:|---|
-| logmel_crnn_gru_baseline_e50_gpu | 0.7463 | 0.7814 | Run chính, hoàn tất 50/50 epochs trên GPU |
-| logmel_crnn_bilstm_extension_e50_gpu | Chưa có | Chưa có | Chưa hoàn tất do giới hạn thời gian |
+| Run | best_val_acc | test_acc | trainable_params | avg_epoch_time_sec | Ghi chú |
+|---|---:|---:|---:|---:|---|
+| logmel_crnn_gru_baseline_e50_gpu | 0.7463 | 0.7814 | 71,338 | 83.59 | Run chính (GRU 1 chiều, hidden=96, lr=1e-3, dropout=0.3) |
+| logmel_crnn_bilstm_extension_e50_gpu | 0.7218 | 0.7228 | 150,250 | 81.49 | Run mở rộng (BiLSTM, hidden=96, lr=7e-4, dropout=0.35) |
 
-Chỉ số bổ sung của baseline:
+Chỉ số bổ sung:
 
-- best_val_loss: 0.8938
-- test_loss: 0.6794
-- avg_epoch_time_sec: 83.59
+- Baseline GRU: best_val_loss = 0.8938, test_loss = 0.6794.
+- Extension BiLSTM: best_val_loss = 0.9829, test_loss = 0.7795.
+- Cả hai run đều chạy đủ 50/50 epochs trên GPU và được log lên W&B.
 
 ## 6. Learning curves
 
@@ -111,17 +111,39 @@ Bảng so sánh định tính:
 
 Nhận xét nhanh:
 
-- CRNN tăng test_acc khoảng +0.19 so với 1D-CNN log-mel tốt nhất, dùng ít hơn ~51% tham số.
-- Đổi lại, mỗi epoch CRNN tốn hơn 18 lần thời gian do thêm CNN 2D và RNN.
+- CRNN-GRU tăng test_acc khoảng +0.19 so với 1D-CNN log-mel tốt nhất, dùng ít hơn ~51% tham số.
+- CRNN-BiLSTM (mở rộng) cũng vượt 1D-CNN log-mel (+0.13 test_acc) mặc dù dùng nhiều tham số hơn GRU.
+- Đổi lại, mỗi epoch CRNN tốn hơn 1D-CNN log-mel khoảng 18 lần thời gian do thêm CNN 2D và RNN.
 - Trên cùng feature log-mel và cùng học sinh, kết quả ủng hộ giả thuyết của Lab 4: mô hình hoá thời gian bằng RNN giúp ích cho phân loại âm thanh môi trường.
+
+## 8b. So sánh nội bộ hai run CRNN
+
+| Tiêu chí | Baseline GRU | Extension BiLSTM |
+|---|---:|---:|
+| rnn_type | GRU 1 chiều | LSTM 2 chiều |
+| hidden_size | 96 | 96 |
+| lr | 1e-3 | 7e-4 |
+| dropout | 0.30 | 0.35 |
+| trainable_params | 71,338 | 150,250 |
+| best_val_acc | 0.7463 | 0.7218 |
+| best_val_loss | 0.8938 | 0.9829 |
+| test_acc | 0.7814 | 0.7228 |
+| test_loss | 0.6794 | 0.7795 |
+| avg_epoch_time_sec | 83.59 | 81.49 |
+
+Nhận xét:
+
+- Trái với kỳ vọng "BiLSTM sẽ tốt hơn GRU", cấu hình mở rộng bị thấp hơn baseline khoảng 5.9 điểm test_acc dù gấp đôi tham số.
+- Nguyên nhân có thể: (i) mô hình nhiều tham số hơn cần nhiều dữ liệu/epoch hơn để hội tụ, (ii) lr=7e-4 + dropout=0.35 khả năng cao là quy chính mạnh khiến underfit nhẹ, (iii) trên fold 10 cụ thể, hướng ngược của BiLSTM không bù được chi phí dung lượng tham số tăng.
+- Kết quả cho thấy cần thử cross-validate qua nhiều fold hoặc tăng số epoch / giảm regularization trước khi kết luận BiLSTM kém hơn GRU.
 
 ## 9. Kết luận
 
-Baseline CRNN-GRU với log-mel đã huấn luyện đủ 50 epochs trên GPU và đạt test accuracy 0.7814, cao hơn run tốt nhất của Lab 3 (1D-CNN log-mel, test 0.5914) khoảng 19 điểm phần trăm dù chỉ dùng ~71 nghìn tham số so với ~146 nghìn ở Lab 3. Learning curves cho thấy mô hình hội tụ tốt, có overfitting nhẹ ở giai đoạn cuối nhưng chưa gây suy giảm mạnh trên test fold 10. Confusion matrix cho thấy các lớp cơ học mạnh như gun_shot và jackhammer phân biệt tốt, trong khi siren và children_playing vẫn còn khó. Đổi lại, thời gian huấn luyện mỗi epoch của CRNN dài hơn 1D-CNN khoảng 18 lần, nên cần cân nhắc giữa độ chính xác và chi phí. Hướng tiếp theo là hoàn tất run BiLSTM mở rộng và tinh chỉnh augmentation cho các lớp dễ nhầm.
+Baseline CRNN-GRU với log-mel đã huấn luyện đủ 50 epochs trên GPU và đạt test accuracy 0.7814, cao hơn run tốt nhất của Lab 3 (1D-CNN log-mel, test 0.5914) khoảng 19 điểm phần trăm dù chỉ dùng ~71 nghìn tham số so với ~146 nghìn ở Lab 3. Run mở rộng CRNN-BiLSTM cũng đã hoàn tất 50 epochs và đạt test accuracy 0.7228, tốt hơn 1D-CNN nhưng kém baseline GRU, cho thấy dung lượng mô hình lớn hơn cần được cân bằng với lr và dropout phù hợp. Learning curves cho thấy cả hai mô hình hội tụ tốt, có overfitting nhẹ ở giai đoạn cuối nhưng chưa gây suy giảm mạnh trên test fold 10. Confusion matrix cho thấy các lớp cơ học mạnh như gun_shot và jackhammer phân biệt tốt, trong khi siren và children_playing vẫn còn khó với cả hai run. Đổi lại, thời gian huấn luyện mỗi epoch của CRNN dài hơn 1D-CNN khoảng 18 lần, nên cần cân nhắc giữa độ chính xác và chi phí. Hướng tiếp theo: tinh chỉnh lr/dropout cho BiLSTM, tăng số epoch hoặc dùng k-fold CV để đánh giá công bằng hơn, và mạnh tay hơn với augmentation cho các lớp dễ nhầm (siren, children_playing).
 
 ## 10. Link minh chứng
 
 - GitHub commit cuối: cập nhật sau khi push commit mới
 - W&B run debug: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cj951u5k
-- W&B run baseline: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cfccch9h
-- W&B run mở rộng: chưa hoàn tất
+- W&B run baseline GRU: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cfccch9h
+- W&B run extension BiLSTM: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/rcsrrb3x
