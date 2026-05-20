@@ -1,6 +1,12 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/wQpVslL8)
 # CSC4005 Lab 4 – CRNN for Environmental Sound Classification
 
+## Thông tin sinh viên
+
+- Họ tên: Lưu Thanh Tùng
+- Lớp: KHMT-1701
+- Mã sinh viên: 1771040029
+
 Starter kit này dành cho **Lab 4 của Bài 5 – CRNN** trong CSC4005. Repo nối tiếp trực tiếp từ Lab 3:
 
 - **Lab 3:** UrbanSound8K + MFCC/log-mel + 1D-CNN + W&B
@@ -178,9 +184,39 @@ Log cuối run:
 
 ## 10. Checklist nộp bài
 
-- [ ] Có ít nhất 1 run CRNN baseline trên W&B
-- [ ] Có learning curves
-- [ ] Có confusion matrix
-- [ ] Có so sánh với kết quả Lab 3 1D-CNN
-- [ ] Có nhận xét lớp âm thanh nào dễ nhầm
-- [ ] Có đề xuất ít nhất 2 hướng cải thiện mô hình
+- [x] Có ít nhất 1 run CRNN baseline trên W&B
+- [x] Có learning curves
+- [x] Có confusion matrix
+- [x] Có so sánh với kết quả Lab 3 1D-CNN
+- [x] Có nhận xét lớp âm thanh nào dễ nhầm
+- [x] Có đề xuất ít nhất 2 hướng cải thiện mô hình
+
+## 11. Kết quả hiện tại
+
+Run baseline hoàn tất bằng GPU với cấu hình 50 epochs:
+
+- Config: `configs/baseline_logmel_crnn.json`
+- Output: `outputs/logmel_crnn_gru_baseline_e50_gpu/`
+- best_val_acc: 0.7463
+- test_acc: 0.7814
+- avg_epoch_time_sec: 83.59
+
+W&B links:
+
+- Project: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn
+- Debug run: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cj951u5k
+- Baseline run: https://wandb.ai/thanhtung-contact-official-/csc4005-lab4-urbansound8k-crnn/runs/cfccch9h
+
+## 12. So sánh nhanh với Lab 3
+
+| Run | Feature | Model | test_acc | trainable_params | avg_epoch_time_sec |
+|---|---|---|---:|---:|---:|
+| Lab 3 log-mel (best) | log-mel | 1D-CNN | 0.5914 | 145,610 | 4.55 |
+| Lab 4 baseline (run chính) | log-mel | CRNN-GRU | 0.7814 | 71,338 | 83.59 |
+
+Chi tiết các run còn lại được lưu trong `outputs/1771040029_*` (Lab 3) và `outputs/logmel_crnn_gru_baseline_e50_gpu/` (Lab 4). Bảng so sánh đầy đủ nằm tại mục 8 trong `REPORT_TEMPLATE.md`.
+
+Ghi chú:
+
+- Run mở rộng BiLSTM 50 epochs chưa hoàn tất do giới hạn thời gian.
+- Báo cáo chi tiết đã điền tại `REPORT_TEMPLATE.md`.

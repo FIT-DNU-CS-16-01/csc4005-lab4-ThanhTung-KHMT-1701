@@ -1,11 +1,26 @@
+.github
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
+venv/
 .env
-wandb/
-outputs/*
-!outputs/.gitkeep
+
+# Data and generated artifacts
 data/
+.cache/
+!outputs/.gitkeep
 *.zip
-.tmp_ci_urbansound/
+*.tar.gz
+*.pt
+*.pth
+*.ckpt
+
+# W&B
+wandb/
+
+# OS / IDE
 .DS_Store
+.idea/
+.vscode/
